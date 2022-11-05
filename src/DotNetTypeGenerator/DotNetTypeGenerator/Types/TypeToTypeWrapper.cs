@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using DotNetTypeGenerator.Delegates;
 
 namespace DotNetTypeGenerator.Types;
 
