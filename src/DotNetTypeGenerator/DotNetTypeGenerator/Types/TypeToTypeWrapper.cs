@@ -505,7 +505,7 @@ public class TypeToTypeWrapper
     }
 
     private static void AddReferences(
-        DotNetTypeGenerator generator, 
+        CodeToAssemblyGenerator generator, 
         List<Type> allTypes, 
         TypeToTypeWrapperOptions options, 
         Type originalType)

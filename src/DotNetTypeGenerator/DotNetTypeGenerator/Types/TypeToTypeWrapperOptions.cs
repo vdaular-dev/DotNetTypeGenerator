@@ -49,7 +49,7 @@ public class TypeToTypeWrapperOptions
     public bool IsSourceCodePrettified { get; set; } = true;
     public Type Inherits { get; set; } = null;
     public List<Type> Implements { get; set; } = null;
-    public DotNetTypeGenerator AssemblyGenerator { get; set; } = new DotNetTypeGenerator();
+    public CodeToAssemblyGenerator AssemblyGenerator { get; set; } = new CodeToAssemblyGenerator();
 }
 
 public class AdditionalParameter
