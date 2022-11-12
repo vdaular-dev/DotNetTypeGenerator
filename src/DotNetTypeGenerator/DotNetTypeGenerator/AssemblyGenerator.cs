@@ -7,7 +7,7 @@ using System.Runtime.Loader;
 
 namespace DotNetTypeGenerator;
 
-public class CodeToAssemblyGenerator
+public class AssemblyGenerator
 {
     private readonly IList<Assembly> _assemblies = new List<Assembly>();
     private readonly IList<MetadataReference> _references = new List<MetadataReference>();
@@ -22,7 +22,7 @@ public class CodeToAssemblyGenerator
     public static Func<AssemblyLoadContext> DefaultAssemblyLoadContextFactory { get; set; } 
         = () => new CustomAssemblyLoadContext(null);
 
-    public CodeToAssemblyGenerator(
+    public AssemblyGenerator(
         bool persist, 
         string? workingFolder, 
         List<Assembly>? assemblies, 
@@ -47,14 +47,14 @@ public class CodeToAssemblyGenerator
                 ReferenceAssembly(assembly);
     }
 
-    public CodeToAssemblyGenerator(
+    public AssemblyGenerator(
         bool persist, 
         string? workingFolder, 
         List<Assembly>? assemblies, 
         AssemblyLoadContext? assemblyLoadContext) : 
         this(persist, workingFolder, assemblies, () => assemblyLoadContext) { }
 
-    public CodeToAssemblyGenerator(
+    public AssemblyGenerator(
         bool persist = true, 
         string? workingFolder = default, 
         List<Assembly>? assemblies = null) : 

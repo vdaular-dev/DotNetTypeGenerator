@@ -24,7 +24,7 @@ public class DelegateToTypeWrapper
 
         var allTypes = GetRequiredTypes(parameters, returnType);
 
-        var generator = new CodeToAssemblyGenerator();
+        var generator = new AssemblyGenerator();
         AddReferences(generator, allTypes);
 
         var code = new StringBuilder();
@@ -267,7 +267,7 @@ public class DelegateToTypeWrapper
             code.AppendLine($"using {t.Namespace};");
     }
 
-    private static void AddReferences(CodeToAssemblyGenerator generator, List<Type> allTypes)
+    private static void AddReferences(AssemblyGenerator generator, List<Type> allTypes)
     {
         generator.ReferenceAssemblyContainingType<Action>();
         generator.ReferenceAssemblyContainingType<DelegateCache>();
