@@ -63,8 +63,8 @@ public class TypeCache
 
 public class TypeCacheItem
 {
-    public Func<object> Factory { get; set; }
-    public Action<object> OnConstructor { get; set; }
+    public Func<object>? Factory { get; set; }
+    public Action<object>? OnConstructor { get; set; }
     public Action<object, MethodInfo>? OnBeforeMethod { get; set; }
     public Action<object, MethodInfo>? OnAfterMethod { get; set; }
 }

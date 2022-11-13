@@ -11,11 +11,11 @@ public class AssemblyGenerator
 {
     private readonly IList<Assembly> _assemblies = new List<Assembly>();
     private readonly IList<MetadataReference> _references = new List<MetadataReference>();
-    private readonly string _workingFolder;
+    private readonly string? _workingFolder;
     private readonly bool _persist;
-    private readonly AssemblyLoadContext _assemblyLoadContext;
+    private readonly AssemblyLoadContext? _assemblyLoadContext;
 
-    public AssemblyLoadContext LoadContext => _assemblyLoadContext;
+    public AssemblyLoadContext? LoadContext => _assemblyLoadContext;
 
     public string? AssemblyName { get; set; }
 
@@ -26,7 +26,7 @@ public class AssemblyGenerator
         bool persist, 
         string? workingFolder, 
         List<Assembly>? assemblies, 
-        Func<AssemblyLoadContext?> assemblyLoadContextFactory)
+        Func<AssemblyLoadContext>? assemblyLoadContextFactory)
     {
         var entryAssembly = Assembly.GetEntryAssembly();
         var name = entryAssembly?.GetName().Name ?? Guid.NewGuid().ToString();
@@ -36,7 +36,8 @@ public class AssemblyGenerator
             workingFolder = Path.Combine(Path.GetTempPath(), "DotNetTypeGenerator", name, version);
 
         _workingFolder = workingFolder;
-        _assemblyLoadContext = assemblyLoadContextFactory();
+        AssemblyLoadContext? assemblyLoadContext = assemblyLoadContextFactory();
+        _assemblyLoadContext = assemblyLoadContext;
 
         if (_assemblyLoadContext == null) _assemblyLoadContext = DefaultAssemblyLoadContextFactory();
 
@@ -62,31 +63,35 @@ public class AssemblyGenerator
 
     public void ReferenceAssembly(Assembly? assembly)
     {
-        if (assembly == null || _assemblies.Contains(assembly)) return;
-
-        _assemblies.Add(assembly);
-
-        try
+        if (assembly != null && !_assemblies.Contains(assembly))
         {
-            var referencePath = CreateAssemblyReference(assembly);
+            _assemblies.Add(assembly);
 
-            if (_references.Any(x => x.Display == referencePath)) return;
-
-            var metadataReference = MetadataReference.CreateFromFile(referencePath);
-            _references.Add(metadataReference);
-
-            foreach (var referecedAssembly in assembly.GetReferencedAssemblies())
+            try
             {
-                if (_assemblies.Any(x => x.GetName() == referecedAssembly)) continue;
+                string? referencePath = CreateAssemblyReference(assembly);
 
-                var loadedAssembly = _assemblyLoadContext.LoadFromAssemblyName(referecedAssembly);
+                if (!_references.Any(x => x.Display == referencePath))
+                {
+                    PortableExecutableReference portableExecutableReference = MetadataReference.CreateFromFile(referencePath);
+                    PortableExecutableReference metadataReference = portableExecutableReference;
+                    _references.Add(metadataReference);
 
-                ReferenceAssembly(loadedAssembly);
+                    foreach (var referecedAssembly in assembly.GetReferencedAssemblies())
+                    {
+                        if (!_assemblies.Any(x => x.GetName() == referecedAssembly))
+                        {
+                            var loadedAssembly = _assemblyLoadContext.LoadFromAssemblyName(referecedAssembly);
+
+                            ReferenceAssembly(loadedAssembly);
+                        }
+                    }
+                }
             }
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"Couldn't make an assembly reference to {assembly.FullName}. Try to continue without the assembly.", ex);
+            catch (Exception ex)
+            {
+                throw new Exception($"No fue posible crear una referencia de ensamblado a {assembly.FullName}. Se intenta continuar sin el ensamblado.", ex);
+            }
         }
     }
 
@@ -104,7 +109,7 @@ public class AssemblyGenerator
         var array = _references.ToArray();
         var syntaxTreeArray = new SyntaxTree[1] { text };
 
-        if (!Directory.Exists(_workingFolder)) Directory.CreateDirectory(_workingFolder);
+        if (!Directory.Exists(_workingFolder)) Directory.CreateDirectory((string)_workingFolder);
 
         var compilation = CSharpCompilation
             .Create(assemblyName, syntaxTreeArray, array,
@@ -143,7 +148,7 @@ public class AssemblyGenerator
 
             File.WriteAllBytes(fullPath, dllStream.ToArray());
 
-            var assembly = _assemblyLoadContext.LoadFromAssemblyPath(fullPath);
+            var assembly = _assemblyLoadContext?.LoadFromAssemblyPath(fullPath);
 
             return assembly;
         }

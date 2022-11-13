@@ -10,7 +10,7 @@ namespace DotNetTypeGenerator.Types;
 
 public class TypeToTypeWrapper
 {
-    public Type CreateType(Type originalType, TypeToTypeWrapperOptions options = default)
+    public Type CreateType(Type? originalType, TypeToTypeWrapperOptions? options = default)
     {
         if (originalType == null)
             throw new ArgumentNullException(nameof(originalType));
@@ -82,7 +82,7 @@ public class TypeToTypeWrapper
             d.Add(methodInfo, (delegateMethodParameters, methodParameterNamesWithTypes));
         }
 
-        if (options.AdditionalConstructorParameters?.Any() == true)
+        if (options?.AdditionalConstructorParameters?.Any() == true)
             foreach (var additionalConstructorParameter in options.AdditionalConstructorParameters)
                 AddConstructorParameter
                     (additionalConstructorParameter, 
@@ -97,10 +97,10 @@ public class TypeToTypeWrapper
 
         var inheritedAndImplementedTypes = new List<Type>();
 
-        if (options.Inherits != null)
+        if (options?.Inherits != null)
             inheritedAndImplementedTypes.Add(options.Inherits);
 
-        if (options.Implements != null)
+        if (options?.Implements != null)
             inheritedAndImplementedTypes.AddRange(options.Implements);
 
         var inheritance = string.Empty;
@@ -195,12 +195,12 @@ public class TypeToTypeWrapper
     }
 
     private static void CreateConstructor(
-        TypeToTypeWrapperOptions options, 
-        List<string> constructorParameterNames, 
-        List<string> constructorFieldNamesWithTypes, 
+        TypeToTypeWrapperOptions? options, 
+        List<string>? constructorParameterNames, 
+        List<string>? constructorFieldNamesWithTypes, 
         StringBuilder code, 
-        List<string> constructorParameterNamesWithTypes, 
-        Type originalType, 
+        List<string>? constructorParameterNamesWithTypes, 
+        Type? originalType, 
         Guid id)
     {
         if (constructorParameterNames?.Any() == true)
@@ -392,10 +392,10 @@ public class TypeToTypeWrapper
         return types;
     }
 
-    private static string GetTypeName(TypeToTypeWrapperOptions options, Type originalType) 
+    private static string GetTypeName(TypeToTypeWrapperOptions? options, Type originalType) 
         => options?.TypeNameGenerator != null ? options.TypeNameGenerator(options, originalType) : "GeneratedType";
 
-    private static string GetNamespace(TypeToTypeWrapperOptions options, Type originalType) 
+    private static string GetNamespace(TypeToTypeWrapperOptions? options, Type originalType) 
         => options?.NamespaceNameGenerator != null ? options.NamespaceNameGenerator(options, originalType) : "GeneratedNamespace";
 
     private void AddConstructorParameter(
@@ -563,7 +563,7 @@ public class TypeToTypeWrapper
         return new Regex(regex, RegexOptions.Compiled);
     }
 
-    private List<Type> GetRequiredTypes(ParameterInfo[] parameters, Type returnType)
+    private List<Type> GetRequiredTypes(ParameterInfo[]? parameters, Type returnType)
     {
         var allTypes = new List<Type>();
 
@@ -580,7 +580,7 @@ public class TypeToTypeWrapper
         return allTypes;
     }
 
-    private List<MethodInfo> GetMethodsToWrap(Type originalType, TypeToTypeWrapperOptions options)
+    private List<MethodInfo> GetMethodsToWrap(Type? originalType, TypeToTypeWrapperOptions? options)
     {
         var result = new List<MethodInfo>();
         var allTypeMethods = originalType.GetMethods();
@@ -607,7 +607,7 @@ public class TypeToTypeWrapper
                 continue;
             }
 
-            foreach (var includeMethodName in options.IncludeMethods)
+            foreach (var includeMethodName in options?.IncludeMethods)
             {
                 var regEx = NameToRegex(includeMethodName);
 
