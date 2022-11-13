@@ -48,7 +48,7 @@ jobs:
       working-directory: ./src/${{ env.PROJECT_NAME }}
     - name: Test
       run: dotnet test --configuration Release /p:Version=${VERSION} --no-build
-      working-directory: ./tests/${{ env.PROJECT_NAME }}.Tests
+      working-directory: ./tests/${{ env.PROJECT_NAME }}.Tests/${{ env.PROJECT_NAME }}.Tests
     - name: Pack
       run: dotnet pack --no-restore --no-build --configuration Release /p:Version=${VERSION} --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
       working-directory: ./src/${{ env.PROJECT_NAME }}
