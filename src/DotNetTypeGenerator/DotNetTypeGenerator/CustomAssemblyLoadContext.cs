@@ -35,7 +35,8 @@ public class CustomAssemblyLoadContext : AssemblyLoadContext
 
         foreach (var assembly in _assemblies)
         {
-            if (assembly.FullName != assemblyName.FullName) continue;
+            if (assembly.FullName != assemblyName.FullName) 
+                continue;
 
             return LoadFromAssemblyPath(assembly.Location);
         }

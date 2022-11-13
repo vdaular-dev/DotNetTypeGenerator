@@ -39,13 +39,17 @@ public class AssemblyGenerator
         AssemblyLoadContext? assemblyLoadContext = assemblyLoadContextFactory();
         _assemblyLoadContext = assemblyLoadContext;
 
-        if (_assemblyLoadContext == null) _assemblyLoadContext = DefaultAssemblyLoadContextFactory();
+        if (_assemblyLoadContext == null) 
+            _assemblyLoadContext = DefaultAssemblyLoadContextFactory();
 
         _persist = persist;
 
         if (assemblies?.Any() == true)
             foreach (var assembly in assemblies)
                 ReferenceAssembly(assembly);
+
+        ReferenceAssemblyContainingType<object>();
+        ReferenceAssembly(typeof(Enumerable).GetTypeInfo().Assembly);
     }
 
     public AssemblyGenerator(
@@ -109,7 +113,8 @@ public class AssemblyGenerator
         var array = _references.ToArray();
         var syntaxTreeArray = new SyntaxTree[1] { text };
 
-        if (!Directory.Exists(_workingFolder)) Directory.CreateDirectory((string)_workingFolder);
+        if (!Directory.Exists(_workingFolder)) 
+            Directory.CreateDirectory(_workingFolder);
 
         var compilation = CSharpCompilation
             .Create(assemblyName, syntaxTreeArray, array,
@@ -117,11 +122,12 @@ public class AssemblyGenerator
                     null, null, null, OptimizationLevel.Debug, false,
                     false, null, null, new ImmutableArray<byte>(), new bool?()));
 
-        var fullPath = Path.Combine(_workingFolder, assemblyName);
+        var fullPath = Path.Combine(_workingFolder, assemblyName + ".dll");
         var assemblies = _assemblies
             .Where(x => !string.IsNullOrWhiteSpace(x.Location)).Select(x => x).ToList();
 
-        if (_assemblyLoadContext is CustomAssemblyLoadContext customAssemblyLoadContext) customAssemblyLoadContext.SetAssemblies(assemblies);
+        if (_assemblyLoadContext is CustomAssemblyLoadContext customAssemblyLoadContext)
+            customAssemblyLoadContext.SetAssemblies(assemblies);
 
         if (!_persist)
         {
@@ -129,7 +135,8 @@ public class AssemblyGenerator
             {
                 var emitResult = compilation.Emit(memoryStream);
 
-                if (!emitResult.Success) ThrowError(code, emitResult);
+                if (!emitResult.Success) 
+                    ThrowError(code, emitResult);
 
                 memoryStream.Seek(0L, SeekOrigin.Begin);
                 var assembly = LoadContext.LoadFromStream(memoryStream);
@@ -144,7 +151,8 @@ public class AssemblyGenerator
         {
             var emitResult = compilation.Emit(dllStream, pdbStream, win32Resources: win32resStream);
 
-            if (!emitResult.Success) ThrowError(code, emitResult);
+            if (!emitResult.Success) 
+                ThrowError(code, emitResult);
 
             File.WriteAllBytes(fullPath, dllStream.ToArray());
 
@@ -161,7 +169,7 @@ public class AssemblyGenerator
 
         var errorMsg = string.Join("\n", errors.Select(x => $"{x.Id}: {x.GetMessage()}"));
 
-        var errorMsgWithCode = $"Compilation failures! " +
+        var errorMsgWithCode = $"Fallas de Compilación: " +
             $"{Environment.NewLine}" +
             $"{Environment.NewLine}" +
             $"{errorMsg}" +
