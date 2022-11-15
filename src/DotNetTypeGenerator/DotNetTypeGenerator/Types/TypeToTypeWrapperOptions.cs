@@ -15,7 +15,7 @@ public class TypeToTypeWrapperOptions
     {
         if (method.IsAbstract) return false;
 
-        if (method.IsPublic) return false;
+        if (!method.IsPublic) return false;
 
         if (method.IsStatic) return false;
 

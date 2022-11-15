@@ -109,7 +109,7 @@ public class TypeToTypeWrapper
             inheritance = $" : {string.Join(", ", inheritedAndImplementedTypes.Select(x => x.FullName))}";
 
         code.AppendLine($"public class {GetTypeName(options, originalType)} {inheritance}");
-        code.AppendLine("{");
+        code.StartBlock();
 
         CreateInstance(originalType, code, id);
 
@@ -143,9 +143,9 @@ public class TypeToTypeWrapper
         }
 
         if (options.IsSourceCodeIncluded)
-            code.AppendLine("##sourceplaceholder##");
+            code.AppendLine("/*sourceplaceholder*/");
 
-        code.AppendLine("}");
+        code.FinishBlock();
 
         var fullCode = code.ToString();
 
@@ -156,8 +156,8 @@ public class TypeToTypeWrapper
         {
             code.AppendLine("// Source code begins");
 
-            fullCode = fullCode.Replace("##sourceplacheholder##",
-                $"private string _source = @\"{Environment.NewLine}{fullCode.Replace("\"", "\"\"").Replace("##sourceplaceholder##", "")}\";");
+            fullCode = fullCode.Replace("/*sourceplaceholder*/",
+                $"private string _source = @\"{Environment.NewLine}{fullCode.Replace("\"", "\"\"").Replace("/*sourceplaceholder*/", "")}\";");
 
             code.AppendLine("// Source code ends");
         }
@@ -493,15 +493,26 @@ public class TypeToTypeWrapper
 
     private static void AddNamespace(StringBuilder code, List<Type> allTypes)
     {
-        code.AppendLine("using System;");
-        code.AppendLine("using System.Diagnostics;");
-        code.AppendLine("using System.Threading.Tasks;");
-        code.AppendLine("using System.Text;");
-        code.AppendLine("using System.Collections;");
-        code.AppendLine("using System.Collections.Generic;");
+        List<string> namespaces = new()
+        {
+            "using System;",
+            "using System.Diagnostics;",
+            "using System.Threading.Tasks;",
+            "using System.Text;",
+            "using System.Collections;",
+            "using System.Collections.Generic;"
+        };
 
-        foreach (var allType in allTypes)
-            code.AppendLine($"using {allType.Namespace};");
+        foreach (Type type in allTypes)
+        {
+            var line = $"using {type.Namespace};";
+
+            if (!namespaces.Contains(line))
+                namespaces.Add(line);
+        }
+
+        foreach (var ns in namespaces)
+            code.AppendLine(ns);
     }
 
     private static void AddReferences(
