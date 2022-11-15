@@ -15,7 +15,8 @@ public class DelegateToTypeWrapper
     {
         var methodInfo = multicastDelegate.GetMethodInfo();
 
-        if (methodInfo == null) throw new Exception("Couldn't get method information from delegate");
+        if (methodInfo == null) 
+            throw new Exception("Couldn't get method information from delegate");
 
         var parameters = methodInfo.GetParameters();
         var returnType = methodInfo.ReturnType;
@@ -95,7 +96,7 @@ public class DelegateToTypeWrapper
         if (typeof(void) != returnType)
             code.AppendLine($"public {GetFriendlyName(returnType)} {GetMethodName(options)} ({string.Join(", ", methodParameterNamesWithTypes)})");
         else
-            code.AppendLine($"public void Run ({string.Join(", ", methodParameterNamesWithTypes)})");
+            code.AppendLine($"public void Run({string.Join(", ", methodParameterNamesWithTypes)})");
 
         code.AppendLine("{");
 
@@ -168,7 +169,7 @@ public class DelegateToTypeWrapper
             code.AppendLine("{");
 
             foreach (var constructorParameterName in constructorParameterNames)
-                code.AppendLine($"_{constructorParameterName} = {constructorParameterName}");
+                code.AppendLine($"_{constructorParameterName} = {constructorParameterName};");
 
             code.AppendLine("}");
         }
@@ -246,7 +247,8 @@ public class DelegateToTypeWrapper
                 }
             }
 
-            if (!handled) continue;
+            if (handled) 
+                continue;
 
             methodParameterNamesWithTypes.Add($"{GetFriendlyName(parameterType)} {parameterName}");
 
@@ -256,15 +258,26 @@ public class DelegateToTypeWrapper
 
     private static void AddNamespaces(StringBuilder code, List<Type> allTypes)
     {
-        code.AppendLine("using System;");
-        code.AppendLine("using System.Diagnostics;");
-        code.AppendLine("using System.Threading.Tasks;");
-        code.AppendLine("using System.Text;");
-        code.AppendLine("using System.Collections;");
-        code.AppendLine("using System.Collections.Generic;");
+        List<string> namespaces = new()
+        {
+            "using System;",
+            "using System.Diagnostics;",
+            "using System.Threading.Tasks;",
+            "using System.Text;",
+            "using System.Collections;",
+            "using System.Collections.Generic;"
+        };
 
-        foreach (var t in allTypes)
-            code.AppendLine($"using {t.Namespace};");
+        foreach (Type type in allTypes)
+        {
+            var line = $"using {type.Namespace};";
+
+            if (!namespaces.Contains(line))
+                namespaces.Add(line);
+        }
+
+        foreach (var ns in namespaces)
+            code.AppendLine(ns);
     }
 
     private static void AddReferences(AssemblyGenerator generator, List<Type> allTypes)
@@ -285,24 +298,30 @@ public class DelegateToTypeWrapper
 
         var genTypes = new List<Type>();
 
-        foreach (var type in allTypes) genTypes = GetGenericTypes(type, genTypes);
+        foreach (var type in allTypes) 
+            genTypes = GetGenericTypes(type, genTypes);
 
-        foreach (var genType in genTypes) allTypes.Add(genType);
+        foreach (var genType in genTypes) 
+            allTypes.Add(genType);
 
         return allTypes;
     }
 
     public List<Type> GetGenericTypes(Type type, List<Type> types)
     {
-        if (types == null) types = new List<Type>();
+        if (types == null) 
+            types = new List<Type>();
 
-        if (!types.Contains(type)) types.Add(type);
+        if (!types.Contains(type)) 
+            types.Add(type);
 
-        if (!type.IsGenericType) return types;
+        if (!type.IsGenericType) 
+            return types;
 
         var typeParameters = type.GetGenericArguments();
 
-        foreach (var typeParameter in typeParameters) GetGenericTypes(typeParameter, types);
+        foreach (var typeParameter in typeParameters) 
+            GetGenericTypes(typeParameter, types);
 
         return types;
     }
