@@ -208,7 +208,7 @@ public class TypeToTypeWrapper
             foreach (var fieldNameWithType in constructorFieldNamesWithTypes)
                 code.AppendLine($"private {fieldNameWithType};");
 
-            code.AppendLine($"pubilc {GetTypeName(options, originalType)}({string.Join(", ", constructorParameterNamesWithTypes)})");
+            code.AppendLine($"public {GetTypeName(options, originalType)}({string.Join(", ", constructorParameterNamesWithTypes)})");
             code.StartBlock();
 
             foreach (var constructorParameterName in constructorParameterNames)
