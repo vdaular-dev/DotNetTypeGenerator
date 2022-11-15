@@ -106,7 +106,7 @@ public class TypeToTypeWrapper
         var inheritance = string.Empty;
 
         if (inheritedAndImplementedTypes.Any())
-            inheritance = $" : {string.Join(", ", inheritedAndImplementedTypes.Select(x => x.FullName))}";
+            inheritance = $" : {string.Join(", ", inheritedAndImplementedTypes.Select(x => x.FullName.Replace('+', '.')))}";
 
         code.AppendLine($"public class {GetTypeName(options, originalType)} {inheritance}");
         code.StartBlock();
