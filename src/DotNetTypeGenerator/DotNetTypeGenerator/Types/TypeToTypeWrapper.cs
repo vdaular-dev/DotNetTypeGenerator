@@ -368,7 +368,7 @@ public class TypeToTypeWrapper
     {
         code.AppendLine();
 
-        code.AppendLine($"private {originalType.FullName} _instance = ({originalType.FullName}) DotNetTypeGenerator.Types.TypeCache.Get(System.Guid.Parse(\"{id.ToString()}\"));");
+        code.AppendLine($"private {originalType.FullName.Replace('+', '.')} _instance = ({originalType.FullName.Replace('+', '.')}) DotNetTypeGenerator.Types.TypeCache.Get(System.Guid.Parse(\"{id.ToString()}\"));");
 
         code.AppendLine();
     }
