@@ -106,6 +106,9 @@ public class AssemblyGenerator
 
     public void ReferenceAssemblyContainingType<T>() => ReferenceAssembly(typeof(T).GetTypeInfo().Assembly);
 
+    private static string GetWithDllExtension(string input) =>
+            input.EndsWith(".dll") ? input : $"{input}.dll";
+
     public Assembly GenerateAssembly(string code)
     {
         var assemblyName = AssemblyName ?? Path.GetFileNameWithoutExtension(Path.GetRandomFileName());
@@ -122,7 +125,7 @@ public class AssemblyGenerator
                     null, null, null, OptimizationLevel.Debug, false,
                     false, null, null, new ImmutableArray<byte>(), new bool?()));
 
-        var fullPath = Path.Combine(_workingFolder, assemblyName + ".dll");
+        var fullPath = Path.Combine(_workingFolder, GetWithDllExtension(assemblyName));
         var assemblies = _assemblies
             .Where(x => !string.IsNullOrWhiteSpace(x.Location)).Select(x => x).ToList();
 
